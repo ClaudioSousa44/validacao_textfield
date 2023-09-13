@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,19 +47,44 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     var text by rememberSaveable { mutableStateOf("") }
+    var isError2 by rememberSaveable { mutableStateOf("") }
+    var isError3 by rememberSaveable { mutableStateOf(false) }
     Column {
+        fun validate(text: String) {
+            if(text.isEmpty()){
+                isError2 = "vazio"
+                isError3 = true}
+            else if(text.length > 10 )
+                isError2 = "maior que dez"
+        }
+        if(isError2 == "vazio"){
         Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
-        out(text, {text = it})
+            text = "O campo não pode ser vazio",
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(start = 16.dp)
+        )}
+        if(isError2 == "maior que dez"){
+            Text(
+                text = "O campo não pode ser maior que 10",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp)
+            )}
+        out(text, {text = it},isError3)
+
+        Button(onClick = {
+            validate(text)
+        }) {
+
+        }
     }
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun out(value: String, aoMudar: (String) -> Unit) {
+fun out(value: String, aoMudar: (String) -> Unit, isError2:Boolean) {
 //    var text by rememberSaveable { mutableStateOf("") }
     var isError by rememberSaveable { mutableStateOf(false) }
 
@@ -78,7 +104,7 @@ fun out(value: String, aoMudar: (String) -> Unit) {
                     Icon(Icons.Filled.Info, "Error", tint = MaterialTheme.colorScheme.error)
             },
             singleLine = true,
-            isError = isError,
+            isError = isError2,
             keyboardActions = KeyboardActions { validate(value) },
         )
         if (isError) {
